@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script type="text/javascript" src="Scripts/jquery-2.1.4.js"></script>
+</head>
+<body>
+
+<input id="fileupload" type="file"/>
+    <input type="button" value="upload" onclick="Upload();"/>
+
+<div id="result"></div>
+<script type="text/javascript">
+
+    function Upload() {
+        
+        ///create a new FormData object
+        var formData = new FormData(); //var formData = new FormData($('form')[0]);
+
+        ///get the file and append it to the FormData object
+        formData.append('file', $('#fileupload')[0].files[0]);
+
+        
+        ///AJAX request
+        $.ajax(
+        {
+            ///server script to process data
+            url: "FileUploadHandler.ashx", //web service
+            type: 'POST',
+            complete: function () {
+
+                $("#result").append("<br /> complete");
+            },
+            ///Ajax events
+            beforeSend: function (e) {
+                //before event  
+                $("#result").append(("<br />" + "beforeSend"));
+
+            },
+            success: function (e) {
+                //success event
+                $("#result").append("<br />" + e);
+            },
+            error: function (e) {
+                //errorHandler
+                $("#result").append("<br />" + e);
+            },
+            ///Form data
+            data: formData,
+            ///Options to tell JQuery not to process data or worry about content-type
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+        ///end AJAX request
+
+    }
+
+
+</script>
+</body>
+</html>
