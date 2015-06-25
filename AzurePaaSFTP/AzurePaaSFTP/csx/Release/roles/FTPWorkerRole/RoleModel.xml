@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RoleModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="FTPWorkerRole" version="2.6.6496.2" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition">
+  <Startup>
+    <Task commandLine="RemoteAccessAgent.exe" executionContext="elevated" taskType="background" relativePath="plugins\RemoteAccess">
+      <Environment>
+        <Variable name="RdModuleName" value="RemoteAccess" />
+        <Variable name="WaRoleType" value="WorkerRole" />
+      </Environment>
+    </Task>
+    <Task commandLine="RemoteAccessAgent.exe /blockStartup" executionContext="elevated" relativePath="plugins\RemoteAccess">
+      <Environment>
+        <Variable name="RdModuleName" value="RemoteAccess" />
+        <Variable name="WaRoleType" value="WorkerRole" />
+      </Environment>
+    </Task>
+    <Task commandLine="install.cmd" executionContext="elevated" relativePath="plugins\RemoteForwarder">
+      <Environment>
+        <Variable name="IsEmulated">
+          <RoleInstanceValue xpath="/RoleEnvironment/Deployment/@emulated" />
+        </Variable>
+        <Variable name="RdModuleName" value="RemoteForwarder" />
+        <Variable name="WaRoleType" value="WorkerRole" />
+      </Environment>
+    </Task>
+    <Task commandLine="Startup.cmd" executionContext="elevated" relativePath="approot\">
+      <Environment>
+        <Variable name="WaRoleType" value="WorkerRole" />
+      </Environment>
+    </Task>
+  </Startup>
+  <Runtime>
+    <EntryPoint>
+      <NetFxEntryPoint assemblyName="FTPWorkerRole.dll" targetFrameworkVersion="v4.0" />
+    </EntryPoint>
+  </Runtime>
+  <ConfigurationSettings>
+    <Setting name="Enabled" nameSpace="Microsoft.WindowsAzure.Plugins.RemoteAccess" />
+    <Setting name="AccountUsername" nameSpace="Microsoft.WindowsAzure.Plugins.RemoteAccess" />
+    <Setting name="AccountEncryptedPassword" nameSpace="Microsoft.WindowsAzure.Plugins.RemoteAccess" />
+    <Setting name="AccountExpiration" nameSpace="Microsoft.WindowsAzure.Plugins.RemoteAccess" />
+    <Setting name="Enabled" nameSpace="Microsoft.WindowsAzure.Plugins.RemoteForwarder" />
+  </ConfigurationSettings>
+  <Properties>
+    <Property name="TargetFrameworkVersion" value="v4.5" />
+    <Property name="RoleType" value="Worker" />
+    <Property name="RoleName" value="FTPWorkerRole" />
+    <Property name="ProjectName" value="FTPWorkerRole" />
+    <Property name="Configuration" value="Release" />
+    <Property name="Platform" value="AnyCPU" />
+    <Property name="RoleTargetFramework" value="v4.5" />
+    <Property name="OutputDir" value="F:\DevDevDev\RangerYuGitRepo\GithubCodeSamples\AzurePaaSFTP\AzurePaaSFTP\obj\Release\FTPWorkerRole\" />
+    <Property name="EntryPoint" value="FTPWorkerRole.dll" />
+    <Property name="SourceDir" value="" />
+    <Property name="SitePhysicalPath" value="" />
+    <Property name="TargetRuntimeVersion" value="v4.0" />
+  </Properties>
+</RoleModel>

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<serviceContract xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" dslVersion="1.0.0.0" name="AzurePaaSFTPContract" xmlns="http://schemas.microsoft.com/dsltools/Contracts">
+  <elements>
+    <interface name="FTPWorkerRole:FTP21" url="tcp://*:21" />
+    <interface name="FTPWorkerRole:FTP990" url="tcp://*:990" />
+    <interface name="FTPWorkerRole:FTP-Dyn-10000" url="tcp://*:10000" />
+    <interface name="FTPWorkerRole:FTP-Dyn-10001" url="tcp://*:10001" />
+    <interface name="FTPWorkerRole:FTP-Dyn-10002" url="tcp://*:10002" />
+    <interface name="FTPWorkerRole:FTP-Dyn-10003" url="tcp://*:10003" />
+    <interface name="FTPWorkerRole:FTP-Dyn-10004" url="tcp://*:10004" />
+    <interface name="FTPWorkerRole:FTP-Dyn-10005" url="tcp://*:10005" />
+    <interface name="FTPWorkerRole:Microsoft.WindowsAzure.Plugins.RemoteForwarder.RdpInput" url="tcp://*:3389" />
+  </elements>
+</serviceContract>

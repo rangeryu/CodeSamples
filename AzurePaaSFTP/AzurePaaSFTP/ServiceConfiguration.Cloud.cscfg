@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ServiceConfiguration serviceName="AzurePaaSFTP" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="4" osVersion="*" schemaVersion="2015-04.2.6">
+  <Role name="FTPWorkerRole">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=mediasto;AccountKey=+MpT8o5G3GwP8hWXo/G6bQ7hCnN9Q0AZOQf808eCQ7ik/skq4kkSHF3ExJmH0YMFSKZUL/DYyyRZzw4ef8x6BQ==" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.Enabled" value="true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountUsername" value="rangeryu" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountEncryptedPassword" value="MIIBnQYJKoZIhvcNAQcDoIIBjjCCAYoCAQAxggFOMIIBSgIBADAyMB4xHDAaBgNVBAMME1dpbmRvd3MgQXp1cmUgVG9vbHMCEGbq5I2x9V+1QnBfRUkBfEAwDQYJKoZIhvcNAQEBBQAEggEAamnhUpmuwPOLAiIemfJovj5MvA3e5yZzjmQ2GWMoPNfXJVe2eEY+BqU4pG+IvVshx/h45ZfrOVNAI6SRIQU9fYe+FOkFaNcb3Jan+hTjPaEZmK+JY2D+fZFCyJH0WxhGJqybgylvY6Uq22xvgQCJ24dJmMNQuvhKgdVNhd5hogOrgfnB50+pXtRB+LAscoZp42B3ZMGornYEa9tXSoCdRqqakZT6jsUB5BTE6C77JgONAXqGWGBye4qm1Fqh6yTybB9LkSKuDOq0XBVwse/v3JjRyAqNG/QqQTTPg1RbtrIxBYXhWSEY4LFKsaumxpOBTkxXV6XZWtRSePx9p980VDAzBgkqhkiG9w0BBwEwFAYIKoZIhvcNAwcECDxI21MclznpgBDADxxkNq2PN5/j3EY9Y9wu" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountExpiration" value="2016-06-25T23:59:59.0000000+08:00" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteForwarder.Enabled" value="true" />
+    </ConfigurationSettings>
+    <Certificates>
+      <Certificate name="Microsoft.WindowsAzure.Plugins.RemoteAccess.PasswordEncryption" thumbprint="01239AB9898596280E5BD2A4D2FCDE057DB5CE82" thumbprintAlgorithm="sha1" />
+    </Certificates>
+  </Role>
+</ServiceConfiguration>
