@@ -4,7 +4,7 @@ SETLOCAL EnableDelayedExpansion
 
 SET FtpSiteName="FTPWorkerRole"
 
-SET FtpDirectory="C:\FtpRoot"
+SET FtpDirectory="\\10.0.0.4\ftpshare"
 
 SET PublicPort=21
 
@@ -15,9 +15,8 @@ SET DynamicPortLast=10005
 SET DynamicPortRange=%DynamicPortFirst%-%DynamicPortLast%
 
 REM: we cannot retrive the cloud service VIP at this time but if it is within VNET, here we can surely hardcode the static vnet ip.
-SET PublicIP= "23.97.78.120"
+SET PublicIP="10.0.0.10"
 
- 
 
 REM Install FTP.
 
@@ -53,7 +52,7 @@ appcmd set config %FtpSiteName% /section:system.ftpserver/security/authorization
 
 appcmd set config /section:system.ftpServer/firewallSupport /lowDataChannelPort:%DynamicPortFirst% /highDataChannelPort:%DynamicPortLast%
 
-appcmd set config -section:system.applicationHost/sites /siteDefaults.ftpServer.firewallSupport.externalIp4Address:"%PublicIP%" /commit:apphost
+appcmd set config -section:system.applicationHost/sites /siteDefaults.ftpServer.firewallSupport.externalIp4Address:%PublicIP% /commit:apphost
 
  
 
@@ -71,3 +70,4 @@ net stop ftpsvc
 
 net start ftpsvc
 
+EXIT /B 0

@@ -1,6 +1,6 @@
 ﻿REM starting up
 
-SET logPath="C:\FtpRoot\StartupLog.txt"
+SET logPath="C:\Logs\StartupLog.txt"
 
 ECHO Startup.cmd: >> %logPath% 2>&1
 ECHO Current date and time: >> %logPath% 2>&1

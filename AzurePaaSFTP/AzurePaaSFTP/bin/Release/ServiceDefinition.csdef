@@ -14,17 +14,17 @@
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" />
     </ConfigurationSettings>
     <Endpoints>
-      <InputEndpoint name="FTP21" protocol="tcp" port="21" localPort="21" loadBalancerDistribution="sourceIP" />
-      <InputEndpoint name="FTP990" protocol="tcp" port="990" localPort="990" loadBalancerDistribution="sourceIP" />
-      <InputEndpoint name="FTP-Dyn-10000" protocol="tcp" port="10000" localPort="10000" loadBalancerDistribution="sourceIP" />
-      <InputEndpoint name="FTP-Dyn-10001" protocol="tcp" port="10001" localPort="10001" loadBalancerDistribution="sourceIP" />
-      <InputEndpoint name="FTP-Dyn-10002" protocol="tcp" port="10002" localPort="10002" loadBalancerDistribution="sourceIP" />
-      <InputEndpoint name="FTP-Dyn-10003" protocol="tcp" port="10003" localPort="10003" loadBalancerDistribution="sourceIP" />
-      <InputEndpoint name="FTP-Dyn-10004" protocol="tcp" port="10004" localPort="10004" loadBalancerDistribution="sourceIP" />
-      <InputEndpoint name="FTP-Dyn-10005" protocol="tcp" port="10005" localPort="10005" loadBalancerDistribution="sourceIP" />
+      <InputEndpoint name="FTP21" protocol="tcp" port="21" localPort="21" loadBalancerDistribution="sourceIP" loadBalancer="FTPWorkerRoleILB" />
+      <InputEndpoint name="FTP990" protocol="tcp" port="990" localPort="990" loadBalancerDistribution="sourceIP" loadBalancer="FTPWorkerRoleILB" />
+      <InputEndpoint name="FTP-Dyn-10000" protocol="tcp" port="10000" localPort="10000" loadBalancerDistribution="sourceIP" loadBalancer="FTPWorkerRoleILB" />
+      <InputEndpoint name="FTP-Dyn-10001" protocol="tcp" port="10001" localPort="10001" loadBalancerDistribution="sourceIP" loadBalancer="FTPWorkerRoleILB" />
+      <InputEndpoint name="FTP-Dyn-10002" protocol="tcp" port="10002" localPort="10002" loadBalancerDistribution="sourceIP" loadBalancer="FTPWorkerRoleILB" />
+      <InputEndpoint name="FTP-Dyn-10003" protocol="tcp" port="10003" localPort="10003" loadBalancerDistribution="sourceIP" loadBalancer="FTPWorkerRoleILB" />
+      <InputEndpoint name="FTP-Dyn-10004" protocol="tcp" port="10004" localPort="10004" loadBalancerDistribution="sourceIP" loadBalancer="FTPWorkerRoleILB" />
+      <InputEndpoint name="FTP-Dyn-10005" protocol="tcp" port="10005" localPort="10005" loadBalancerDistribution="sourceIP" loadBalancer="FTPWorkerRoleILB" />
     </Endpoints>
     <Startup>
-      <Task commandLine="Startup.cmd" executionContext="elevated" taskType="simple"></Task>
+      <Task commandLine="Startup.cmd" executionContext="elevated" taskType="background"></Task>
     </Startup>
     <Imports>
       <Import moduleName="RemoteAccess" />

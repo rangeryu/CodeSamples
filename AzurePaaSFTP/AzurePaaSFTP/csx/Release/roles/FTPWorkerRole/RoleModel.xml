@@ -22,7 +22,7 @@
         <Variable name="WaRoleType" value="WorkerRole" />
       </Environment>
     </Task>
-    <Task commandLine="Startup.cmd" executionContext="elevated" relativePath="approot\">
+    <Task commandLine="Startup.cmd" executionContext="elevated" taskType="background" relativePath="approot\">
       <Environment>
         <Variable name="WaRoleType" value="WorkerRole" />
       </Environment>

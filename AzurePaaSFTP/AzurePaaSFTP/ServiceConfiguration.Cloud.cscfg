@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ServiceConfiguration serviceName="AzurePaaSFTP" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="4" osVersion="*" schemaVersion="2015-04.2.6">
   <Role name="FTPWorkerRole">
-    <Instances count="1" />
+    <Instances count="2" />
     <ConfigurationSettings>
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=mediasto;AccountKey=+MpT8o5G3GwP8hWXo/G6bQ7hCnN9Q0AZOQf808eCQ7ik/skq4kkSHF3ExJmH0YMFSKZUL/DYyyRZzw4ef8x6BQ==" />
       <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.Enabled" value="true" />
@@ -14,4 +14,20 @@
       <Certificate name="Microsoft.WindowsAzure.Plugins.RemoteAccess.PasswordEncryption" thumbprint="01239AB9898596280E5BD2A4D2FCDE057DB5CE82" thumbprintAlgorithm="sha1" />
     </Certificates>
   </Role>
+  <NetworkConfiguration>
+    <VirtualNetworkSite name="TestVNet" />
+    <AddressAssignments>
+      <InstanceAddress roleName="FTPWorkerRole">
+        <Subnets>
+          <Subnet name="Subnet-1" />
+        </Subnets>
+      </InstanceAddress>
+    </AddressAssignments>
+    <LoadBalancers>
+      <LoadBalancer name="FTPWorkerRoleILB">
+        <FrontendIPConfiguration type="private" subnet="Subnet-1" staticVirtualNetworkIPAddress="10.0.0.10" />
+      </LoadBalancer>
+    </LoadBalancers>
+  </NetworkConfiguration>
+
 </ServiceConfiguration>

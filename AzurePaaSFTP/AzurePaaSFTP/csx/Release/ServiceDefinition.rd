@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<serviceModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="AzurePaaSFTP" generation="1" functional="0" release="0" Id="09983827-4889-4b4e-8e9f-a450f24925b7" dslVersion="1.2.0.0" xmlns="http://schemas.microsoft.com/dsltools/RDSM">
+<serviceModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="AzurePaaSFTP" generation="1" functional="0" release="0" Id="819088bf-ee84-4c88-8f06-9a47e7620985" dslVersion="1.2.0.0" xmlns="http://schemas.microsoft.com/dsltools/RDSM">
   <groups>
     <group name="AzurePaaSFTPGroup" generation="1" functional="0" release="0">
       <componentports>
@@ -244,49 +244,49 @@
     </group>
   </groups>
   <implements>
-    <implementation Id="f5ce5ef4-7946-40a9-b516-695484f77ead" ref="Microsoft.RedDog.Contract\ServiceContract\AzurePaaSFTPContract@ServiceDefinition">
+    <implementation Id="641f765c-be43-4563-a5ba-9c3ee06edc79" ref="Microsoft.RedDog.Contract\ServiceContract\AzurePaaSFTPContract@ServiceDefinition">
       <interfacereferences>
-        <interfaceReference Id="31cf3f5f-5a04-4787-8f4c-f6e7859a8988" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:FTP21@ServiceDefinition">
+        <interfaceReference Id="aede2f33-ffa4-4d17-a8a6-94147f5c5bae" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:FTP21@ServiceDefinition">
           <inPort>
             <inPortMoniker name="/AzurePaaSFTP/AzurePaaSFTPGroup/FTPWorkerRole:FTP21" />
           </inPort>
         </interfaceReference>
-        <interfaceReference Id="919084e7-1858-46ce-8aa0-3c3329a98acc" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:FTP990@ServiceDefinition">
+        <interfaceReference Id="9aeb8e17-b17a-4c02-b9ec-fcc9227807a7" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:FTP990@ServiceDefinition">
           <inPort>
             <inPortMoniker name="/AzurePaaSFTP/AzurePaaSFTPGroup/FTPWorkerRole:FTP990" />
           </inPort>
         </interfaceReference>
-        <interfaceReference Id="41b2b0a0-0576-4a22-a6a3-61b353fb90c2" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:FTP-Dyn-10000@ServiceDefinition">
+        <interfaceReference Id="76cc6a57-1322-4c21-bd48-4d46bfd338de" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:FTP-Dyn-10000@ServiceDefinition">
           <inPort>
             <inPortMoniker name="/AzurePaaSFTP/AzurePaaSFTPGroup/FTPWorkerRole:FTP-Dyn-10000" />
           </inPort>
         </interfaceReference>
-        <interfaceReference Id="cbe0ad58-5fc6-4990-a4f6-4ca66d185a26" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:FTP-Dyn-10001@ServiceDefinition">
+        <interfaceReference Id="f26b998d-1165-46f3-a9eb-06a84687cacc" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:FTP-Dyn-10001@ServiceDefinition">
           <inPort>
             <inPortMoniker name="/AzurePaaSFTP/AzurePaaSFTPGroup/FTPWorkerRole:FTP-Dyn-10001" />
           </inPort>
         </interfaceReference>
-        <interfaceReference Id="3d0d59f9-90ac-4c80-80b3-a8b23f87bbf9" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:FTP-Dyn-10002@ServiceDefinition">
+        <interfaceReference Id="c3c8fcab-d6ef-4e16-ab54-e11e8e723e87" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:FTP-Dyn-10002@ServiceDefinition">
           <inPort>
             <inPortMoniker name="/AzurePaaSFTP/AzurePaaSFTPGroup/FTPWorkerRole:FTP-Dyn-10002" />
           </inPort>
         </interfaceReference>
-        <interfaceReference Id="14213a08-b9e5-4837-9ff2-e47ccdc61c8a" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:FTP-Dyn-10003@ServiceDefinition">
+        <interfaceReference Id="0f412042-9d1f-41a2-b7a7-4db2657432c8" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:FTP-Dyn-10003@ServiceDefinition">
           <inPort>
             <inPortMoniker name="/AzurePaaSFTP/AzurePaaSFTPGroup/FTPWorkerRole:FTP-Dyn-10003" />
           </inPort>
         </interfaceReference>
-        <interfaceReference Id="a9b99d54-8e59-411b-8bf6-c79a00ed4b72" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:FTP-Dyn-10004@ServiceDefinition">
+        <interfaceReference Id="7a4b0083-6747-4aff-8e2b-83c3725a5df8" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:FTP-Dyn-10004@ServiceDefinition">
           <inPort>
             <inPortMoniker name="/AzurePaaSFTP/AzurePaaSFTPGroup/FTPWorkerRole:FTP-Dyn-10004" />
           </inPort>
         </interfaceReference>
-        <interfaceReference Id="4379e870-1217-49d3-924f-c65d6663f504" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:FTP-Dyn-10005@ServiceDefinition">
+        <interfaceReference Id="9c8adfbe-9ab1-41af-b517-84e2f872ec1f" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:FTP-Dyn-10005@ServiceDefinition">
           <inPort>
             <inPortMoniker name="/AzurePaaSFTP/AzurePaaSFTPGroup/FTPWorkerRole:FTP-Dyn-10005" />
           </inPort>
         </interfaceReference>
-        <interfaceReference Id="9f17d103-3210-4f8c-a69b-421e0ba7ac74" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:Microsoft.WindowsAzure.Plugins.RemoteForwarder.RdpInput@ServiceDefinition">
+        <interfaceReference Id="564e600b-225d-4225-aff8-96c6e59ebabf" ref="Microsoft.RedDog.Contract\Interface\FTPWorkerRole:Microsoft.WindowsAzure.Plugins.RemoteForwarder.RdpInput@ServiceDefinition">
           <inPort>
             <inPortMoniker name="/AzurePaaSFTP/AzurePaaSFTPGroup/FTPWorkerRole:Microsoft.WindowsAzure.Plugins.RemoteForwarder.RdpInput" />
           </inPort>
