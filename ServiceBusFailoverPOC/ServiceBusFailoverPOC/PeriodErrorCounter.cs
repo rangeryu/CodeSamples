@@ -58,5 +58,6 @@ namespace ServiceBusFailoverPOC
             for (int i = 0; i < count; i++)
                 _errorQueue.Enqueue(DateTime.UtcNow);
         }
+
     }
 }

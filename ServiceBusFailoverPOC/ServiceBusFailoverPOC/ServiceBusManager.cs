@@ -38,7 +38,7 @@ namespace ServiceBusFailoverPOC
 
         private QueueClient _clientMaster;
         private QueueClient _clientSlave;
-        private PeriodErrorCounter _errorCounter;
+        private readonly PeriodErrorCounter _errorCounter;
         private bool _directSlave;
 
 
@@ -49,7 +49,7 @@ namespace ServiceBusFailoverPOC
             this.ConnectionStringMaster = connectionStringMaster;
             this.ConnectionStringSlave = connectionStringSlave;
 
-            _errorCounter = new PeriodErrorCounter(10);
+            _errorCounter = new PeriodErrorCounter(30);
 
             this._pauseProcessingEvent = new ManualResetEvent(true);
         }
@@ -127,19 +127,22 @@ namespace ServiceBusFailoverPOC
             {
                 await retryPolicy.ExecuteAsync(async() =>
                 {
-                    if (_directSlave)
-                      await _clientSlave.SendAsync(brokeredMsg);
+                    if (!_directSlave)
+                        await _clientMaster.SendAsync(brokeredMsg);
                     else
-                      await _clientMaster.SendAsync(brokeredMsg);
+                      await _clientSlave.SendAsync(brokeredMsg);
                 });
                 return true;
             }
             catch  (Exception ex)
             {
                 Trace.TraceWarning("Sending from Slave instance. Master instance Error:" + ex.Message);
+                
+                // if in the last (_errorCounter.TimeWindowSeconds, 30s set in constructor) seconds, the error count reachs 20, send all following message via slave directly.
                 _errorCounter.AddCount(1);
                 if (_errorCounter.ActiveErrorCount > 20)
                     _directSlave = true;
+
                 try
                 {
                     retryPolicy.ExecuteAction(() =>
@@ -167,7 +170,10 @@ namespace ServiceBusFailoverPOC
             {
                 await retryPolicy.ExecuteAsync(async () =>
                 {
-                    await _clientMaster.SendBatchAsync(msgList);
+                    if (!_directSlave)
+                        await _clientMaster.SendBatchAsync(msgList);
+                    else
+                        await _clientSlave.SendBatchAsync(msgList);
                 });
                 
                 return true;
@@ -175,6 +181,11 @@ namespace ServiceBusFailoverPOC
             catch (Exception ex)
             {
                 Trace.TraceWarning("Sending from Slave instance. Master instance Error:" + ex.Message);
+
+                _errorCounter.AddCount(1);
+                if (_errorCounter.ActiveErrorCount > 20)
+                    _directSlave = true;
+
                 try
                 {
                     retryPolicy.ExecuteAction(() =>
