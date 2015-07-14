@@ -38,6 +38,8 @@ namespace ServiceBusFailoverPOC
 
         private QueueClient _clientMaster;
         private QueueClient _clientSlave;
+        private PeriodErrorCounter _errorCounter;
+        private bool _directSlave;
 
 
   
@@ -46,6 +48,8 @@ namespace ServiceBusFailoverPOC
             this.QueueName = queueName;
             this.ConnectionStringMaster = connectionStringMaster;
             this.ConnectionStringSlave = connectionStringSlave;
+
+            _errorCounter = new PeriodErrorCounter(10);
 
             this._pauseProcessingEvent = new ManualResetEvent(true);
         }
@@ -56,6 +60,7 @@ namespace ServiceBusFailoverPOC
             _clientSlave = CreateQueueClient(this.ConnectionStringSlave, this.QueueName);
 
         }
+
 
         private QueueClient CreateQueueClient(string connString, string queueName)
         {
@@ -122,13 +127,19 @@ namespace ServiceBusFailoverPOC
             {
                 await retryPolicy.ExecuteAsync(async() =>
                 {
-                    await _clientMaster.SendAsync(brokeredMsg);
+                    if (_directSlave)
+                      await _clientSlave.SendAsync(brokeredMsg);
+                    else
+                      await _clientMaster.SendAsync(brokeredMsg);
                 });
                 return true;
             }
             catch  (Exception ex)
             {
                 Trace.TraceWarning("Sending from Slave instance. Master instance Error:" + ex.Message);
+                _errorCounter.AddCount(1);
+                if (_errorCounter.ActiveErrorCount > 20)
+                    _directSlave = true;
                 try
                 {
                     retryPolicy.ExecuteAction(() =>
