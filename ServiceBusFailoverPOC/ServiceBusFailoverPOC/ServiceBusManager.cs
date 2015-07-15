@@ -34,7 +34,7 @@ namespace ServiceBusFailoverPOC
         }
 
         private readonly ManualResetEvent _pauseProcessingEvent;
-        private readonly TimeSpan _waitTime = TimeSpan.FromSeconds(10);
+        private readonly TimeSpan _waitTime = TimeSpan.FromSeconds(5);
 
         private QueueClient _clientMaster;
         private QueueClient _clientSlave;
@@ -117,8 +117,11 @@ namespace ServiceBusFailoverPOC
             return QueueClient.CreateFromConnectionString(connString, queueName);
         }
 
-        public async Task<bool> SendMessage(TMsgBody msg)
+        public async Task<bool> SendMessageAsync(TMsgBody msg)
         {
+            // Will block the current thread if Stop is called.
+            this._pauseProcessingEvent.WaitOne();
+
             var brokeredMsg = new BrokeredMessage(msg) { MessageId = msg.TaskId };
 
             var retryStrategy = new Incremental(3, TimeSpan.FromMilliseconds(200), TimeSpan.FromMilliseconds(500));
@@ -145,6 +148,7 @@ namespace ServiceBusFailoverPOC
 
                 try
                 {
+                    brokeredMsg = new BrokeredMessage(msg) { MessageId = msg.TaskId };//require to init the brokeredMsg again
                     retryPolicy.ExecuteAction(() =>
                     {
                         _clientSlave.Send(brokeredMsg);
@@ -160,8 +164,11 @@ namespace ServiceBusFailoverPOC
 
         }
 
-        public async Task<bool> SendMessages(IEnumerable<TMsgBody> messages)
+        public async Task<bool> SendMessagesAsync(IEnumerable<TMsgBody> messages)
         {
+            // Will block the current thread if Stop is called.
+            this._pauseProcessingEvent.WaitOne();
+
             var msgList = messages.Select(msg => new BrokeredMessage(msg) { MessageId = msg.TaskId }).ToList();
 
             var retryStrategy = new Incremental(3, TimeSpan.FromMilliseconds(200), TimeSpan.FromMilliseconds(500));
@@ -188,6 +195,7 @@ namespace ServiceBusFailoverPOC
 
                 try
                 {
+                    msgList = messages.Select(msg => new BrokeredMessage(msg) { MessageId = msg.TaskId }).ToList();
                     retryPolicy.ExecuteAction(() =>
                     {
                         _clientSlave.SendBatch(msgList);
@@ -210,12 +218,13 @@ namespace ServiceBusFailoverPOC
         /// bind action to client.OnMessageAsync. so it must be called only once.
         /// </summary>
         /// <param name="processMessageTask"></param>
-        public void StartReceiveMessages(Func<TMsgBody, Task> processMessageTask)
+        public void StartReceiveMessages(Func<TMsgBody,string , Task> processMessageTask)
         {
             // Setup the options for the message pump.
             var options = new OnMessageOptions
             {
                 AutoComplete = false,
+                MaxConcurrentCalls = 50
             };
 
             // When AutoComplete is disabled, you have to manually complete/abandon the messages and handle errors, if any.
@@ -223,7 +232,7 @@ namespace ServiceBusFailoverPOC
 
             // Use of Service Bus OnMessage message pump. The OnMessage method must be called once, otherwise an exception will occur.
 
-            Func<BrokeredMessage,Task> msgProcessFunc = async (BrokeredMessage msg) =>
+            Func<BrokeredMessage,string,Task> msgProcessFunc = async (BrokeredMessage msg, string clientInfo) =>
             {
                 // Will block the current thread if Stop is called.
                 this._pauseProcessingEvent.WaitOne();
@@ -233,7 +242,7 @@ namespace ServiceBusFailoverPOC
 
                     Trace.TraceInformation("Start to process task {0} @{1}", msgBody.TaskId, DateTime.Now);
                     // Execute processing task here
-                    await processMessageTask(msgBody);
+                    await processMessageTask(msgBody, clientInfo);
 
                     Trace.TraceInformation("done task {0} @{1}", msgBody.TaskId, DateTime.Now);
                     switch (msgBody.Status)
@@ -251,18 +260,35 @@ namespace ServiceBusFailoverPOC
                 }
                 catch (Exception ex)
                 {
-                    Trace.TraceError("Exception in QueueClient.OnMessageAsync: {0}", ex.Message);
+                    Trace.TraceError("Exception in QueueClient.OnMessageAsync.msgProcessFunc: {0}", ex.Message);
                     msg.Abandon();
                 }
             };
 
 
             //both Master & Slave  message receiver subscribes the queue and process
-            this._clientMaster.OnMessageAsync(msgProcessFunc,options);
-            this._clientSlave.OnMessageAsync(msgProcessFunc, options);
+            try
+            {
+                this._clientMaster.OnMessageAsync((m) => msgProcessFunc(m, "ClientMaster"), options);
+
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception in ClientMaster.OnMessageAsync: {0}", ex.Message);
+            }
+
+            try
+            {
+                this._clientSlave.OnMessageAsync((m) => msgProcessFunc(m, "ClientSlave"), options);
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception in ClientSlave.OnMessageAsync: {0}", ex.Message);
+
+            }
         }
 
-        public async Task Stop()
+        public async Task StopAsync()
         {
             // Pause the processing threads
             this._pauseProcessingEvent.Reset();
