@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FailoverNormalSendRecvTest.cs" />
     <Compile Include="MessageTask.cs" />
     <Compile Include="PeriodErrorCounter.cs" />
     <Compile Include="Program.cs" />
