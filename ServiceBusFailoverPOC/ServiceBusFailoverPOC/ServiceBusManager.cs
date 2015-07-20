@@ -33,6 +33,18 @@ namespace ServiceBusFailoverPOC
             private set;
         }
 
+        public int MaxConcurrentCalls
+        {
+            get;
+            private set;
+        }
+
+        public int ClientPrefetchCount
+        {
+            get;
+            private set;
+        }
+
         private readonly ManualResetEvent _pauseProcessingEvent;
         private readonly TimeSpan _waitTime = TimeSpan.FromSeconds(5);
 
@@ -40,14 +52,29 @@ namespace ServiceBusFailoverPOC
         private QueueClient _clientSlave;
         private readonly PeriodErrorCounter _errorCounter;
         private bool _directSlave;
+        public bool SlaveEnabled { get; private set; }
 
+        int _totalReceivedCount = 0;
+        int _concurrentJobCount = 0;
 
-  
-        public ServiceBusQueueManager(string queueName, string connectionStringMaster, string connectionStringSlave)
+        public int TotalReceivedCount
+        {
+            get { return _totalReceivedCount; }
+        }
+
+        public int ConcurrentJobCount
+        {
+            get { return _concurrentJobCount; }
+        }
+
+        public ServiceBusQueueManager(string queueName, string connectionStringMaster, string connectionStringSlave = "", int maxConcurrentCalls = 100, int clientPrefetchCount = 200)
         {
             this.QueueName = queueName;
             this.ConnectionStringMaster = connectionStringMaster;
             this.ConnectionStringSlave = connectionStringSlave;
+
+            this.MaxConcurrentCalls = maxConcurrentCalls;
+            this.ClientPrefetchCount = clientPrefetchCount;
 
             _errorCounter = new PeriodErrorCounter(30);
 
@@ -57,7 +84,17 @@ namespace ServiceBusFailoverPOC
         public void Initialize()
         {
             _clientMaster = CreateQueueClient(this.ConnectionStringMaster, this.QueueName);
-            _clientSlave = CreateQueueClient(this.ConnectionStringSlave, this.QueueName);
+             
+
+            if (!string.IsNullOrEmpty(ConnectionStringSlave))
+            {
+                _clientSlave = CreateQueueClient(this.ConnectionStringSlave, this.QueueName);
+                if (_clientSlave != null)
+                {
+                    SlaveEnabled = true;
+                }
+            }
+           
 
         }
 
@@ -130,7 +167,7 @@ namespace ServiceBusFailoverPOC
             {
                 await retryPolicy.ExecuteAsync(async() =>
                 {
-                    if (!_directSlave)
+                    if (!SlaveEnabled || !_directSlave)
                         await _clientMaster.SendAsync(brokeredMsg);
                     else
                       await _clientSlave.SendAsync(brokeredMsg);
@@ -139,27 +176,31 @@ namespace ServiceBusFailoverPOC
             }
             catch  (Exception ex)
             {
-                Trace.TraceWarning("Sending from Slave instance. Master instance Error:" + ex.Message);
+                Trace.TraceWarning("Master instance Error:" + ex.Message);
                 
                 // if in the last (_errorCounter.TimeWindowSeconds, 30s set in constructor) seconds, the error count reachs 20, send all following message via slave directly.
                 _errorCounter.AddCount(1);
-                if (_errorCounter.ActiveErrorCount > 20)
-                    _directSlave = true;
 
-                try
+                if (SlaveEnabled)
                 {
-                    brokeredMsg = new BrokeredMessage(msg) { MessageId = msg.TaskId };//require to init the brokeredMsg again
-                    retryPolicy.ExecuteAction(() =>
+                    if (_errorCounter.ActiveErrorCount > 20)
+                        _directSlave = true;
+
+                    try
                     {
-                        _clientSlave.Send(brokeredMsg);
-                    });
-                    return true;
+                        brokeredMsg = new BrokeredMessage(msg) { MessageId = msg.TaskId };//require to init the brokeredMsg again
+                        retryPolicy.ExecuteAction(() =>
+                        {
+                            _clientSlave.Send(brokeredMsg);
+                        });
+                        return true;
+                    }
+                    catch (Exception secondEx)
+                    {
+                        Trace.TraceError("Slave instance Error:" + secondEx.Message);
+                    }
                 }
-                catch (Exception secondEx)
-                {
-                    Trace.TraceError("Slave instance Error:" + secondEx.Message);
-                    return false; //we may throw the exception directly based on the api design.
-                }
+                return false;
             }
 
         }
@@ -187,26 +228,30 @@ namespace ServiceBusFailoverPOC
             }
             catch (Exception ex)
             {
-                Trace.TraceWarning("Sending from Slave instance. Master instance Error:" + ex.Message);
+                Trace.TraceWarning("Master instance Error:" + ex.Message);
 
                 _errorCounter.AddCount(1);
-                if (_errorCounter.ActiveErrorCount > 20)
-                    _directSlave = true;
 
-                try
+                if (SlaveEnabled)
                 {
-                    msgList = messages.Select(msg => new BrokeredMessage(msg) { MessageId = msg.TaskId }).ToList();
-                    retryPolicy.ExecuteAction(() =>
+                    if (_errorCounter.ActiveErrorCount > 20)
+                        _directSlave = true;
+
+                    try
                     {
-                        _clientSlave.SendBatch(msgList);
-                    });
-                    return true;
+                        msgList = messages.Select(msg => new BrokeredMessage(msg) { MessageId = msg.TaskId }).ToList();
+                        retryPolicy.ExecuteAction(() =>
+                        {
+                            _clientSlave.SendBatch(msgList);
+                        });
+                        return true;
+                    }
+                    catch (Exception secondEx)
+                    {
+                        Trace.TraceWarning("Slave instance Error:" + secondEx.Message);
+                    }
                 }
-                catch (Exception secondEx)
-                {
-                    Trace.TraceWarning("Slave instance Error:" + secondEx.Message);
-                    return false; //we may throw the exception directly based on the api design.
-                }
+                return false;
             }
 
 
@@ -224,7 +269,8 @@ namespace ServiceBusFailoverPOC
             var options = new OnMessageOptions
             {
                 AutoComplete = false,
-                MaxConcurrentCalls = 50
+                MaxConcurrentCalls = this.MaxConcurrentCalls
+                
             };
 
             // When AutoComplete is disabled, you have to manually complete/abandon the messages and handle errors, if any.
@@ -238,13 +284,16 @@ namespace ServiceBusFailoverPOC
                 this._pauseProcessingEvent.WaitOne();
                 try
                 {
+                    Interlocked.Increment(ref _totalReceivedCount);
+                    Interlocked.Increment(ref _concurrentJobCount);
+
                     var msgBody = msg.GetBody<TMsgBody>();
 
-                    Trace.TraceInformation("Start to process task {0} @{1}", msgBody.TaskId, DateTime.Now);
+                    //Trace.TraceInformation("Start to process task {0} @{1}", msgBody.TaskId, DateTime.Now);
                     // Execute processing task here
                     await processMessageTask(msgBody, clientInfo);
 
-                    Trace.TraceInformation("done task {0} @{1}", msgBody.TaskId, DateTime.Now);
+                    //Trace.TraceInformation("done task {0} @{1}", msgBody.TaskId, DateTime.Now);
                     switch (msgBody.Status)
                     {
                         case TaskStatus.Completed:
@@ -263,12 +312,18 @@ namespace ServiceBusFailoverPOC
                     Trace.TraceError("Exception in QueueClient.OnMessageAsync.msgProcessFunc: {0}", ex.Message);
                     msg.Abandon();
                 }
+                finally
+                {
+                    Interlocked.Decrement(ref _concurrentJobCount);
+                }
             };
 
+            //this._clientMaster.PrefetchCount 
 
             //both Master & Slave  message receiver subscribes the queue and process
             try
             {
+                this._clientMaster.PrefetchCount = this.ClientPrefetchCount;
                 this._clientMaster.OnMessageAsync((m) => msgProcessFunc(m, "ClientMaster"), options);
 
             }
@@ -277,15 +332,21 @@ namespace ServiceBusFailoverPOC
                 Trace.TraceError("Exception in ClientMaster.OnMessageAsync: {0}", ex.Message);
             }
 
-            try
+            if (SlaveEnabled)
             {
-                this._clientSlave.OnMessageAsync((m) => msgProcessFunc(m, "ClientSlave"), options);
-            }
-            catch (Exception ex)
-            {
-                Trace.TraceError("Exception in ClientSlave.OnMessageAsync: {0}", ex.Message);
+                try
+                {
+                    this._clientSlave.PrefetchCount = this.ClientPrefetchCount;
+                    this._clientSlave.OnMessageAsync((m) => msgProcessFunc(m, "ClientSlave"), options);
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception in ClientSlave.OnMessageAsync: {0}", ex.Message);
 
+                }
             }
+
+
         }
 
         public async Task StopAsync()
@@ -298,7 +359,9 @@ namespace ServiceBusFailoverPOC
             Thread.Sleep(_waitTime);
 
             await _clientMaster.CloseAsync();
-            await _clientSlave.CloseAsync();
+
+            if (SlaveEnabled)
+                await _clientSlave.CloseAsync();
         }
 
         private void OptionsOnExceptionReceived(object sender, ExceptionReceivedEventArgs exceptionReceivedEventArgs)
