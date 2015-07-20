@@ -29,5 +29,4 @@
       </LoadBalancer>
     </LoadBalancers>
   </NetworkConfiguration>
-
 </ServiceConfiguration>
