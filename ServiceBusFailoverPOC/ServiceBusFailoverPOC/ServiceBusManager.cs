@@ -67,7 +67,7 @@ namespace ServiceBusFailoverPOC
             get { return _concurrentJobCount; }
         }
 
-        public ServiceBusQueueManager(string queueName, string connectionStringMaster, string connectionStringSlave = "", int maxConcurrentCalls = 100, int clientPrefetchCount = 200)
+        public ServiceBusQueueManager(string queueName, string connectionStringMaster, string connectionStringSlave = "", int maxConcurrentCalls = 100, int clientPrefetchCount = 20)
         {
             this.QueueName = queueName;
             this.ConnectionStringMaster = connectionStringMaster;
