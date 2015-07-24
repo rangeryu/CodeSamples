@@ -2,9 +2,7 @@
 
 SETLOCAL EnableDelayedExpansion
 
-SET FtpSiteName="FTPWorkerRole"
-
-SET FtpDirectory="\\10.0.0.4\ftpshare"
+SET FtpSiteName=FTPWorkerRole
 
 SET PublicPort=21
 
@@ -14,31 +12,31 @@ SET DynamicPortLast=10005
 
 SET DynamicPortRange=%DynamicPortFirst%-%DynamicPortLast%
 
-REM: we cannot retrive the cloud service VIP at this time but if it is within VNET, here we can surely hardcode the static vnet ip.
-SET PublicIP="10.0.0.10"
+SET PublicIP=10.0.0.10
 
+SET StorageName=azurewrath
+SET StorageKey=CaZxDxmZnwHEB3/Xk0AwyghmjKsJ18HAeKQ97kLnw12jjFkAn2VY6SSvVJzlGu0RUmAYjpYBYQtFEGXUrxPAYQ==
+SET ShareName=ftpshare
 
+SET FtpDirectory=\\%StorageName%.file.core.windows.net\%ShareName%
+
+REM Add user.
+
+net user %StorageName% /delete
+net user %StorageName% %StorageKey% /add
+ 
 REM Install FTP.
 
 start /w pkgmgr /iu:IIS-WebServerRole;IIS-FTPSvc;IIS-FTPServer;IIS-ManagementConsole
-
- 
-
-REM Create directory.
-
-IF NOT EXIST "%FtpDirectory%" (MKDIR "%FtpDirectory%") 
-
-cacls "%FtpDirectory%" /G IUSR:W /T /E 
-
-cacls "%FtpDirectory%" /G IUSR:R /T /E 
-
- 
 
 REM Configuring FTP site.
 
 pushd %windir%\system32\inetsrv 
 
 appcmd add site /name:%FtpSiteName% /bindings:ftp://*:%PublicPort% /physicalpath:"%FtpDirectory%" 
+
+appcmd set vdir /vdir.name:"%FtpSiteName%/" /userName:%StorageName% /password:%StorageKey%
+
 
 appcmd set config -section:system.applicationHost/sites /[name='%FtpSiteName%'].ftpServer.security.ssl.controlChannelPolicy:"SslAllow" 
 
@@ -52,7 +50,7 @@ appcmd set config %FtpSiteName% /section:system.ftpserver/security/authorization
 
 appcmd set config /section:system.ftpServer/firewallSupport /lowDataChannelPort:%DynamicPortFirst% /highDataChannelPort:%DynamicPortLast%
 
-appcmd set config -section:system.applicationHost/sites /siteDefaults.ftpServer.firewallSupport.externalIp4Address:%PublicIP% /commit:apphost
+appcmd set config -section:system.applicationHost/sites /siteDefaults.ftpServer.firewallSupport.externalIp4Address:"%PublicIP%" /commit:apphost
 
  
 
