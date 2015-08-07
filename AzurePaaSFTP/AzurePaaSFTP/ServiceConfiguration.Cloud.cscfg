@@ -17,16 +17,19 @@
   <NetworkConfiguration>
     <VirtualNetworkSite name="TestVNet" />
     <AddressAssignments>
-      <InstanceAddress roleName="FTPWorkerRole">
+      <ReservedIPs>
+        <ReservedIP name="FTPWorkerRoleIp"/>
+      </ReservedIPs>
+      <!--<InstanceAddress roleName="FTPWorkerRole">
         <Subnets>
           <Subnet name="Subnet-1" />
         </Subnets>
-      </InstanceAddress>
+      </InstanceAddress>-->
     </AddressAssignments>
-    <LoadBalancers>
+    <!--<LoadBalancers>
       <LoadBalancer name="FTPWorkerRoleILB">
         <FrontendIPConfiguration type="private" subnet="Subnet-1" staticVirtualNetworkIPAddress="10.0.0.10" />
       </LoadBalancer>
-    </LoadBalancers>
+    </LoadBalancers>-->
   </NetworkConfiguration>
 </ServiceConfiguration>

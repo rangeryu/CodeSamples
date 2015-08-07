@@ -12,13 +12,21 @@ SET DynamicPortLast=10005
 
 SET DynamicPortRange=%DynamicPortFirst%-%DynamicPortLast%
 
-SET PublicIP=10.0.0.10
+SET PublicIP=23.99.111.169
 
 SET StorageName=azurewrath
 SET StorageKey=CaZxDxmZnwHEB3/Xk0AwyghmjKsJ18HAeKQ97kLnw12jjFkAn2VY6SSvVJzlGu0RUmAYjpYBYQtFEGXUrxPAYQ==
 SET ShareName=ftpshare
-
 SET FtpDirectory=\\%StorageName%.file.core.windows.net\%ShareName%
+
+
+REM Take care of the charactor escaping especially for passwords
+
+SET SSLCertHash=c532d48e0189f6e6058caf0219ecd1ee786f0d64
+SET SSLCertFileName=star_ranger_im.pfx
+SET SSLCertPwd=Password01^^!
+
+certutil -p !SSLCertPwd! -importpfx %SSLCertFileName% 
 
 REM Add user.
 
@@ -53,6 +61,10 @@ appcmd set config /section:system.ftpServer/firewallSupport /lowDataChannelPort:
 appcmd set config -section:system.applicationHost/sites /siteDefaults.ftpServer.firewallSupport.externalIp4Address:"%PublicIP%" /commit:apphost
 
  
+
+appcmd set config -section:system.applicationHost/sites /[name='%FtpSiteName%'].ftpServer.security.ssl.serverCertHash:"%SSLCertHash%" /commit:apphost
+appcmd set config -section:system.applicationHost/sites /[name='%FtpSiteName%'].ftpServer.security.ssl.controlChannelPolicy:"SslRequire" /commit:apphost
+appcmd set config -section:system.applicationHost/sites /[name='%FtpSiteName%'].ftpServer.security.ssl.dataChannelPolicy:"SslRequire" /commit:apphost
 
 REM Configure firewall.
 

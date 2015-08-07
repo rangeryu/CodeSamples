@@ -28,5 +28,4 @@
       </PerformanceCounters>
     </DiagnosticMonitorConfiguration>
   </WadCfg>
-  <StorageAccount>mediasto</StorageAccount>
 </PublicConfig>

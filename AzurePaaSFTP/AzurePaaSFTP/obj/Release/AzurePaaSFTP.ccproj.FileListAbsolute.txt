@@ -50,3 +50,4 @@ F:\DevDevDev\RangerYuGitRepo\GithubCodeSamples\AzurePaaSFTP\AzurePaaSFTP\obj\Rel
 F:\DevDevDev\RangerYuGitRepo\GithubCodeSamples\AzurePaaSFTP\AzurePaaSFTP\obj\Release\FTPWorkerRole\zh-Hant\System.Spatial.resources.dll
 F:\DevDevDev\RangerYuGitRepo\GithubCodeSamples\AzurePaaSFTP\AzurePaaSFTP\obj\Release\FTPWorkerRole\InstallFTP.cmd
 F:\DevDevDev\RangerYuGitRepo\GithubCodeSamples\AzurePaaSFTP\AzurePaaSFTP\obj\Release\FTPWorkerRole\Startup.cmd
+F:\DevDevDev\RangerYuGitRepo\GithubCodeSamples\AzurePaaSFTP\AzurePaaSFTP\obj\Release\FTPWorkerRole\star_ranger_im.pfx

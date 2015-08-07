@@ -58,3 +58,4 @@ F:\DevDevDev\RangerYuGitRepo\GithubCodeSamples\AzurePaaSFTP\FTPWorkerRole\obj\Re
 F:\DevDevDev\RangerYuGitRepo\GithubCodeSamples\AzurePaaSFTP\FTPWorkerRole\bin\Release\InstallFTP.cmd
 F:\DevDevDev\RangerYuGitRepo\GithubCodeSamples\AzurePaaSFTP\FTPWorkerRole\bin\Release\Startup.cmd
 F:\DevDevDev\RangerYuGitRepo\GithubCodeSamples\AzurePaaSFTP\FTPWorkerRole\obj\Release\FTPWorkerRole.csprojResolveAssemblyReference.cache
+F:\DevDevDev\RangerYuGitRepo\GithubCodeSamples\AzurePaaSFTP\FTPWorkerRole\bin\Release\star_ranger_im.pfx
