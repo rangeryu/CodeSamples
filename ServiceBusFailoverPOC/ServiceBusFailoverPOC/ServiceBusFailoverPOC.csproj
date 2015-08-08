@@ -58,12 +58,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConcurrentTest.cs" />
     <Compile Include="FailoverNormalSendRecvTest.cs" />
     <Compile Include="MessageTask.cs" />
     <Compile Include="PeriodErrorCounter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceBusManager.cs" />
+    <Compile Include="ServiceBusTopicManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

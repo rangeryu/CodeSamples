@@ -13,6 +13,9 @@ namespace ServiceBusFailoverPOC
         string TaskContent { get; set; }
 
         TaskStatus Status { get; set; }
+
+        TaskPriority PriorityLevel { get; set; }
+        string TaskCategory { get; set; }
     }
 
     public class MessageTask : IQueuedTask
@@ -20,7 +23,7 @@ namespace ServiceBusFailoverPOC
 
         public string TaskId
         {
-            get; 
+            get;
             set;
         }
 
@@ -35,6 +38,18 @@ namespace ServiceBusFailoverPOC
             get;
             set;
         }
+
+        public TaskPriority PriorityLevel { get; set; }
+        public string TaskCategory { get; set; }
+    }
+
+
+
+    public enum TaskPriority
+    {
+        High = 0,
+        Normal = 1,
+        Low = 2
     }
 
 
